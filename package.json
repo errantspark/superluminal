@@ -1,0 +1,28 @@
+{
+  "type": "module",
+  "name": "superluminal",
+  "version": "0.0.1",
+  "description": "minimal node wiki",
+  "main": "server.js",
+  "scripts": {
+    "test": "node --experimental-modules test.js",
+    "start": "node --experimental-modules server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/errantspark/superluminal.git"
+  },
+  "author": "",
+  "license": "UNLICENSED",
+  "private": true,
+  "bugs": {
+    "url": "https://github.com/errantspark/superluminal/issues"
+  },
+  "homepage": "https://github.com/errantspark/superluminal#readme",
+  "dependencies": {
+    "marked": "^1.0.0",
+    "mime": "^2.4.4",
+    "node-watch": "^0.6.3",
+    "ws": "^7.2.5"
+  }
+}
