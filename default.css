@@ -8,6 +8,10 @@ body {
   background: #ddd;
 }
 
+img {
+  width: 100%;
+}
+
 #wrapper {
   background: #fafafa;
   width: 72rem;
