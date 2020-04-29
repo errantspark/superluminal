@@ -75,9 +75,11 @@ let route = (request, response) =>{
         let isMd = filename.split(".")[1]
         if (isMd === undefined) {
           let source = fs.readFileSync(wikiRoot+request.url+'.md').toString()
+          console.log(wikiRoot+request.url+'.md')
           serveTemplate(source,filename)(request, response)
         } else if (isMd === "md") {
           let source = fs.readFileSync(wikiRoot+request.url).toString()
+          console.log(wikiRoot+request.url)
           serveTemplate(source,filename)(request, response)
         } else {
           serveFile(wikiRoot+request.url)(request, response)
