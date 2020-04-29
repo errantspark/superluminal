@@ -21,7 +21,7 @@ try {
   let config = JSON.parse(fs.readFileSync('./wiki-config.json'))
   wikiRoot = config.wikiRoot
 } catch (e) {
-  console.warn('no config file found, using ./wiki/ as the default directory')
+  console.warn('WARNING: no config file found, using ./wiki/ as the default directory\n')
   wikiRoot = './wiki'
 }
 
