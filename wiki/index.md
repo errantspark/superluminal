@@ -1,6 +1,6 @@
 # superluminal
 ### `C<-`
-Superluminal is a minimal node based wiki. It's intended to be very hackable, and simple while still having some super neat features. 
+Superluminal is a minimal node based wiki. It's intended to be very hackable, and simple while still having some super neat features. It's designed as a single user application and with that in mind leaves it up to the user to secure things. Don't ever run this on a public IP. Deleting your `~` is something **edigint** a wiki file can potentially do (though not by accident, you'd really have to try). All foot guns are intentionally left in on this one.
 
 ## Features
  - a decent markdown wiki
