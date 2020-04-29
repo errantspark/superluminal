@@ -15,7 +15,16 @@ import ws from 'ws'
 import watch from 'node-watch'
 import render from './render.js'
 
-const wikiRoot = '../kiki/data'
+let wikiRoot
+
+try {
+  let config = JSON.parse(fs.readFileSync('./wiki-config.json'))
+  wikiRoot = config.wikiRoot
+} catch (e) {
+  console.warn('no config file found, using ./wiki/ as the default directory')
+  wikiRoot = './wiki'
+}
+
 
 const serveFile = filePath => (req, res) => {
   let url = filePath === undefined?wikiRoot+req.url:filePath
@@ -149,5 +158,6 @@ if (!DEV) {
   let server = http.createServer(serverLogic).listen(8080, '0.0.0.0')
   let wsServer = new ws.Server({server})
   wsServer.on('connection', onWsClient)
+  console.log(`Welcome to Superluminal\nC<-\n\nnow serving ${wikiRoot} on port 8080`)
 }
 
