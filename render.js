@@ -1,5 +1,6 @@
 import fs from 'fs'
 import marked from 'marked'
+import watch from 'node-watch'
 
 let applyTemplate = template => object => {
   let keys = Object.keys(object)
@@ -7,12 +8,10 @@ let applyTemplate = template => object => {
 return \`${template}\``)(object)
 }
 
-
+let template = fs.readFileSync('./default.html').toString()
+watch('./default.html', ()=>template = fs.readFileSync('./default.html').toString())
 // Set options
 // `highlight` example uses `highlight.js`
-let template = fs.readFileSync('./default.html').toString()
-let stylesheet = fs.readFileSync('./default.css').toString()
-let script = fs.readFileSync('./default.js').toString()
 marked.setOptions({
   renderer: new marked.Renderer(),
   /*
@@ -43,8 +42,6 @@ const render = (jsMarkdownString, filename) => {
   let body = marked(preProcess(jsMarkdownString))
   return applyTemplate(template)({
     title: filename,
-    stylesheet,
-    script,
     body
   })
 }

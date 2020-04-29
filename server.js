@@ -12,6 +12,7 @@ import mime from 'mime'
 import http from 'http'
 import https from 'https'
 import ws from 'ws'
+import watch from 'node-watch'
 import render from './render.js'
 
 const wikiRoot = '../kiki/data'
@@ -43,26 +44,35 @@ let serveJSON = (object, res) => {
   res.end(JSON.stringify(object))
 }
 
-let serveTemplate = (template, inject) => async (req, res) =>{
+let serveTemplate = (template, filename) => async (req, res) =>{
+  /*
   let data = inject
   if (typeof inject === 'function') data = await inject(req,res)
+  */
 
   res.writeHead(200)
-  res.end(render(template, data))
+  res.end(render(template, filename))
 }
 
 let route = (request, response) =>{
     try {
       if (request.url === '/') request.url = "/index"
-      let isMd = request.url.split("/").pop().split(".")[1]
-      if (isMd === undefined) {
-        let source = fs.readFileSync(wikiRoot+request.url+'.md').toString()
-        serveTemplate(source)(request, response)
-      } else if (isMd === "md") {
-        let source = fs.readFileSync(wikiRoot+request.url).toString()
-        serveTemplate(source)(request, response)
+      if (request.url === '/default.js') {
+        serveFile('./default.js')(request, response)
+      } else if (request.url === '/default.css') {
+        serveFile('./default.css')(request, response)
       } else {
-        serveFile(wikiRoot+request.url)(request, response)
+        let filename = request.url.split("/").pop()
+        let isMd = filename.split(".")[1]
+        if (isMd === undefined) {
+          let source = fs.readFileSync(wikiRoot+request.url+'.md').toString()
+          serveTemplate(source,filename)(request, response)
+        } else if (isMd === "md") {
+          let source = fs.readFileSync(wikiRoot+request.url).toString()
+          serveTemplate(source,filename)(request, response)
+        } else {
+          serveFile(wikiRoot+request.url)(request, response)
+        }
       }
     } catch (e) {
       console.log(e)
@@ -93,29 +103,20 @@ let serverLogic = (req, res) => {
   }
 }
 
-let connections = []
+let wsClients = []
+watch(wikiRoot, { recursive: true }, ()=> wsClients.forEach(c => c.send('')))
+watch("./", { recursive: true }, ()=> wsClients.forEach(c => c.send('')))
 
-const wsrouter = ws => {
-  connections.push(ws)
-  console.log('new connection: #'+connections.length)
-  ws.on('error', (msg,i) => {
+const onWsClient = wsClient => {
+  wsClients.push(wsClient)
+  console.log('new connection: #'+wsClients.length)
+  wsClient.on('error', (msg,i) => {
     console.log('(　･ัω･ั)？')
     console.log(msg)
     console.log(i)
   })
-  ws.on('message', msg => {
-    console.log(msg)
-    if (msg !== '') {
-      try {
-        msg = JSON.parse(msg)
-        routeSocket(msg)
-      } catch (e) {
-        console.error(e)
-      }
-    }
-  })
-  ws.on('close', ev => {
-    connections.splice(connections.findIndex(x => x === ws),1)
+  wsClient.on('close', ev => {
+    wsClients.splice(wsClients.findIndex(x => x === wsClient),1)
   })
 }
 
@@ -146,7 +147,7 @@ if (!DEV) {
   //wss.on('connection', wsrouter)
 } else {
   let server = http.createServer(serverLogic).listen(8080, '0.0.0.0')
-  //let wss = new ws.Server({server})
-  //wss.on('connection', wsrouter)
+  let wsServer = new ws.Server({server})
+  wsServer.on('connection', onWsClient)
 }
 
