@@ -28,21 +28,25 @@ marked.setOptions({
   smartypants: false,
   xhtml: false
 });
+ 
+//FUCKING LOL DUDE, FUCKING LOL
+let AsyncFunction = Object.getPrototypeOf(async function(){}).constructor
 
 let preProcess = (template, object = {}) => {
   template += ""
   let keys = Object.keys(object)
-  return new Function('input' , `let {${keys.join(',')}} = input
+  return new AsyncFunction('input' , `let {${keys.join(',')}} = input
 return \`${template.replace(/`/gim,"\\\`")}\``)(object)
 }
 
 
-const render = (jsMarkdownString, filename) => {
-  let body = marked(preProcess(jsMarkdownString))
+const render = async (jsMarkdownString, filename, wikiRoot) => {
+  let body = marked(await preProcess(jsMarkdownString, {wikiRoot}))
   return applyTemplate(template)({
     title: filename,
     body
   })
 }
+
 
 export default render

@@ -53,14 +53,15 @@ let serveJSON = (object, res) => {
   res.end(JSON.stringify(object))
 }
 
-let serveTemplate = (template, filename) => async (req, res) =>{
+let serveTemplate = async (template, filename, req, res) =>{
   /*
   let data = inject
   if (typeof inject === 'function') data = await inject(req,res)
   */
 
   res.writeHead(200)
-  res.end(render(template, filename))
+  let html = await render(template, filename, wikiRoot)
+  res.end(html)
 }
 
 let route = (request, response) =>{
@@ -76,11 +77,11 @@ let route = (request, response) =>{
         if (isMd === undefined) {
           let source = fs.readFileSync(wikiRoot+request.url+'.md').toString()
           console.log(wikiRoot+request.url+'.md')
-          serveTemplate(source,filename)(request, response)
+          serveTemplate(source,filename,request, response)
         } else if (isMd === "md") {
           let source = fs.readFileSync(wikiRoot+request.url).toString()
           console.log(wikiRoot+request.url)
-          serveTemplate(source,filename)(request, response)
+          serveTemplate(source,filename,request, response)
         } else {
           serveFile(wikiRoot+request.url)(request, response)
         }
