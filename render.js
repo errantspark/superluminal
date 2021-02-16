@@ -9,8 +9,8 @@ let applyTemplate = template => object => {
 return \`${template}\``)(object)
 }
 
-let template = fs.readFileSync('./default.html').toString()
-watch('./default.html', ()=>template = fs.readFileSync('./default.html').toString())
+let template = fs.readFileSync('./static/default.html').toString()
+watch('./static/default.html', ()=>template = fs.readFileSync('./static/default.html').toString())
 // Set options
 // `highlight` example uses `highlight.js`
 const escapeMap = {

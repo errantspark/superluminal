@@ -66,21 +66,25 @@ let serveTemplate = async (template, filename, req, res) =>{
 
 let route = (request, response) =>{
     try {
-      if (request.url === '/') request.url = "/index"
-      if (request.url === '/default.js') {
-        serveFile('./default.js')(request, response)
-      } else if (request.url === '/default.css') {
-        serveFile('./default.css')(request, response)
+      if (request.url === '/') request.url = "/index.md"
+      if (request.url.slice(0,3) === '/s/') {
+        let path = './static/'+request.url.slice(3)
+        serveFile(path)(request, response)
       } else if (request.url === '/style.css') {
         serveFile('./node_modules/highlight.js/styles/monokai.css')(request, response)
       } else {
         let filename = request.url.split("/").pop()
-        let isMd = filename.split(".")[1]
-        if (isMd === undefined) {
+        let ext = filename.split(".").pop()
+        //TODO this has edge cases, fix
+        if (ext === undefined) {
           let source = fs.readFileSync(wikiRoot+request.url+'.md').toString()
           console.log(wikiRoot+request.url+'.md')
           serveTemplate(source,filename,request, response)
-        } else if (isMd === "md") {
+        } else if (ext === "raw") {
+          //TODO: this CANT be fast right?
+          let path = request.url.split('.').slice(0,-1).join('.')
+          serveFile(wikiRoot+path)(request, response)
+        } else if (ext === "md") {
           let source = fs.readFileSync(wikiRoot+request.url).toString()
           console.log(wikiRoot+request.url)
           serveTemplate(source,filename,request, response)
@@ -114,6 +118,18 @@ let serverLogic = (req, res) => {
       console.log(`[${new Date().toLocaleString()}] ${req.connection.remoteAddress} using ${req.headers["user-agent"]} wants ${req.url}`)
       route(req, res)
       break
+    case 'POST' :
+      let body = ''
+      req.on('data', chunk => {
+        body += chunk.toString(); // convert Buffer to string
+      })
+      req.on('end', () => {
+        //console.log(body,req.url);
+        //lolllll
+        fs.writeFileSync(wikiRoot+req.url, body)
+        res.end('ok');
+      })
+      break
   }
 }
 
@@ -124,6 +140,8 @@ watch("./", { recursive: true }, ()=> wsClients.forEach(c => c.send('')))
 const onWsClient = wsClient => {
   wsClients.push(wsClient)
   console.log('new connection: #'+wsClients.length)
+  wsClient.on('message', (msg,i) => {
+  })
   wsClient.on('error', (msg,i) => {
     console.log('(　･ัω･ั)？')
     console.log(msg)
