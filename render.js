@@ -13,12 +13,26 @@ let template = fs.readFileSync('./default.html').toString()
 watch('./default.html', ()=>template = fs.readFileSync('./default.html').toString())
 // Set options
 // `highlight` example uses `highlight.js`
+const escapeMap = {
+  "&": "&amp;",
+  "<": "&lt;",
+  ">": "&gt;",
+  '"': "&quot;",
+  '`': "&grave;",
+  "'": "&#39;"
+};
+
+const escape = input => {
+  return input.replace(/([&<>'"\`])/g, char => escapeMap[char]);
+}
+
 marked.setOptions({
   renderer: new marked.Renderer(),
   
   highlight: function(code, language) {
-    const validLanguage = hljs.getLanguage(language) ? language : 'plaintext';
-    return hljs.highlight(validLanguage, code).value;
+    const validLanguage = hljs.getLanguage(language) ? language : 'plaintext'
+    const highlighted =  hljs.highlight(validLanguage, code).value
+    return `<pre><code class="hljs ${language}">${highlighted}</code></pre>`
   },
   pedantic: false,
   gfm: true,
@@ -40,8 +54,13 @@ return \`${template.replace(/`/gim,"\\\`")}\``)(object)
 }
 
 
-const render = async (jsMarkdownString, filename, wikiRoot) => {
-  let body = marked(await preProcess(jsMarkdownString, {wikiRoot}))
+const render = async (jsMarkdownString, {filename, wikiRoot, url}) => {
+  let listDir = dir => {
+    //let fs = await import('fs')
+    console.log(wikiRoot+(dir?`/${dir}`:''))
+    return fs.readdirSync(wikiRoot+(dir?`/${dir}`:''))
+  }
+  let body = marked(await preProcess(jsMarkdownString, {escape,filename,url,wikiRoot,listDir}))
   return applyTemplate(template)({
     title: filename,
     body

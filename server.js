@@ -60,7 +60,7 @@ let serveTemplate = async (template, filename, req, res) =>{
   */
 
   res.writeHead(200)
-  let html = await render(template, filename, wikiRoot)
+  let html = await render(template, {filename, url: req.url, wikiRoot})
   res.end(html)
 }
 
@@ -71,6 +71,8 @@ let route = (request, response) =>{
         serveFile('./default.js')(request, response)
       } else if (request.url === '/default.css') {
         serveFile('./default.css')(request, response)
+      } else if (request.url === '/style.css') {
+        serveFile('./node_modules/highlight.js/styles/monokai.css')(request, response)
       } else {
         let filename = request.url.split("/").pop()
         let isMd = filename.split(".")[1]
