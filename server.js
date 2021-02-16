@@ -178,7 +178,7 @@ if (!DEV) {
   //let wss = new ws.Server({server})
   //wss.on('connection', wsrouter)
 } else {
-  let server = http.createServer(serverLogic).listen(8080, '0.0.0.0')
+  let server = http.createServer(serverLogic).listen(1337, '0.0.0.0')
   let wsServer = new ws.Server({server})
   wsServer.on('connection', onWsClient)
   console.log(`Welcome to Superluminal\nC<-\n\nnow serving ${wikiRoot} on port 8080`)
