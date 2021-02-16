@@ -32,4 +32,4 @@ ${await (async () => {
 
 directly in your markdown. This level of insanity is a feature, not a bug.
  
-If you wish to change the root wiki directory (for example for easier version control) take a look at `./wiki-config.example.json`. Copy it to `./wiki-config.json` to bring it live. The file is `.gitignore`d by default so you don't have to worry about accidentally commiting personal info by accident.
+If you wish to change the root wiki directory (for example for easier version control) take a look at `./wiki-config.example.json`. Copy it to `./wiki-config.json` to bring it live. The file is `.gitignore`d by default so you don't have to worry about commiting personal info by accident.
