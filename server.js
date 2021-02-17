@@ -64,14 +64,14 @@ let serveTemplate = async (template, filename, req, res) =>{
   res.end(html)
 }
 
-let route = (request, response) =>{
+let route = async (request, response) =>{
     try {
       if (request.url === '/') request.url = "/index.md"
       if (request.url.slice(0,3) === '/s/') {
         let path = './static/'+request.url.slice(3)
-        serveFile(path)(request, response)
+        await serveFile(path)(request, response)
       } else if (request.url === '/style.css') {
-        serveFile('./node_modules/highlight.js/styles/monokai.css')(request, response)
+        await serveFile('./node_modules/highlight.js/styles/monokai.css')(request, response)
       } else {
         let filename = request.url.split("/").pop()
         let ext = filename.split(".").pop()
@@ -79,17 +79,17 @@ let route = (request, response) =>{
         if (ext === undefined) {
           let source = fs.readFileSync(wikiRoot+request.url+'.md').toString()
           console.log(wikiRoot+request.url+'.md')
-          serveTemplate(source,filename,request, response)
+          await serveTemplate(source,filename,request, response)
         } else if (ext === "raw") {
           //TODO: this CANT be fast right?
           let path = request.url.split('.').slice(0,-1).join('.')
-          serveFile(wikiRoot+path)(request, response)
+          await serveFile(wikiRoot+path)(request, response)
         } else if (ext === "md") {
           let source = fs.readFileSync(wikiRoot+request.url).toString()
           console.log(wikiRoot+request.url)
-          serveTemplate(source,filename,request, response)
+          await serveTemplate(source,filename,request, response)
         } else {
-          serveFile(wikiRoot+request.url)(request, response)
+          await serveFile(wikiRoot+request.url)(request, response)
         }
       }
     } catch (e) {
